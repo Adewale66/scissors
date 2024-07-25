@@ -3,8 +3,10 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Link } from '../../links/entities/link.entity';
 
 @Entity()
 export class User {
@@ -25,4 +27,9 @@ export class User {
 
   @CreateDateColumn()
   createdDate: Date;
+
+  @OneToMany('Link', 'user', {
+    cascade: true,
+  })
+  links: Link[];
 }

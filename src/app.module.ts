@@ -5,11 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import config from './data-source';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { LinksModule } from './links/links.module';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
+    LinksModule,
     ConfigModule.forRoot({
       envFilePath: ['.env', '.env.devlopment.local'],
       isGlobal: true,
@@ -24,5 +28,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ]),
     TypeOrmModule.forRoot(config),
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

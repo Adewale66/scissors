@@ -17,32 +17,13 @@ export interface Payload {
   username: string;
 }
 
-/**
- * Service for handling user authentication and registration.
- *
- * @class AuthService
- */
 @Injectable()
 export class AuthService {
-  /**
-   * Creates an instance of AuthService.
-   *
-   * @param {UsersService} userService - The service used to manage users.
-   * @param {JwtService} jwtService - The service used for handling JWT tokens.
-   */
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
-  /**
-   * Authenticates a user and returns a JWT token.
-   *
-   * @async
-   * @param {LoginDto} loginDto - The login credentials.
-   * @returns {Promise<{ access_token: string }>} An object containing the access token.
-   * @throws {UnauthorizedException} Throws if the email or password is invalid.
-   */
   async signIn(loginDto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.userService.findByUsername(loginDto.username);
     if (!user) {
@@ -61,13 +42,6 @@ export class AuthService {
     };
   }
 
-  /**
-   * Registers a new user and saves their information to the database.
-   *
-   * @async
-   * @param {RegisterDto} registerDto - The registration details.
-   * @returns {Promise<Object>} An object containing the message response.
-   */
   async register(registerDto: RegisterDto): Promise<{ message: string }> {
     const hashedPassword = await argon2.hash(registerDto.password);
     const newUser = new User();

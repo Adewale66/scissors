@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class LoginDto {
-  @IsString()
+export class CustomLinkDto {
   @IsNotEmpty()
-  username: string;
+  @IsString()
+  domain: string;
 
-  @IsString()
   @IsNotEmpty()
-  password: string;
+  @IsString()
+  originalUrl: string;
 }
