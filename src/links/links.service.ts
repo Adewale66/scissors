@@ -1,22 +1,11 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Link } from './entities/link.entity';
 import { Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import QRCode from 'qrcode';
-import { CustomLinkDto } from './dto/custom-link.dto';
-import {
-  generateCustomUrl,
-  generateUrl,
-  validateUrl,
-} from '../utils/generate-custom-url';
+import { generateShort, validateUrl } from '../utils/generate-custom-url';
 
 @Injectable()
 export class LinksService {
@@ -24,74 +13,54 @@ export class LinksService {
     @InjectRepository(Link) private linkRepository: Repository<Link>,
     private readonly configService: ConfigService,
   ) {}
-  custom(customDto: CustomLinkDto, user: User) {
-    const original = validateUrl(customDto.originalUrl);
-    if (!original) {
-      throw new BadRequestException('Invalid URL');
-    }
-    const shortUrl = generateCustomUrl(original, customDto.domain);
-    return this.sendResponse(shortUrl, original, user);
-  }
 
-  create(createLinkDto: CreateLinkDto) {
+  async create(createLinkDto: CreateLinkDto, ip: string) {
     const original = validateUrl(createLinkDto.originalUrl);
     if (!original) {
       throw new BadRequestException('Invalid URL');
     }
-    const shortUrl = generateUrl(original);
-    return this.sendResponse(shortUrl, original);
-  }
-  async sendResponse(short: string, originalUrl: string, user?: User) {
-    const fullUrl = this.configService.get('API_URL') + '/' + short;
-    const qrcodeUrl = await QRCode.toDataURL(fullUrl);
+    const short = generateShort(original, createLinkDto.alias);
+
+    const shortUrl = this.configService.get('API_URL') + '/' + short;
+    const qrcode = await QRCode.toDataURL(shortUrl);
     const link = new Link();
-    link.domain = short;
-    link.originalUrl = originalUrl;
-    link.user = user;
+    link.key = short;
+    link.shortUrl = shortUrl;
+    link.originalUrl = original;
+    link.qrcode = qrcode;
+    link.ip = ip;
     await this.linkRepository.save(link);
 
     return {
-      fullUrl,
-      qrcode: qrcodeUrl,
+      shortUrl,
+      qrcode,
     };
   }
 
-  async findAll(user: User) {
-    return await this.linkRepository.find({
+  async findAll(ip: string, pageLimit, pageOffset) {
+    const limit = parseInt(pageLimit) || 10;
+    const offset = parseInt(pageOffset) || 0;
+    const result = await this.linkRepository.findAndCount({
       where: {
-        user,
+        ip,
       },
+      take: limit,
+      skip: offset,
     });
+    return result[0];
   }
 
-  async findShort(short: string) {
+  async findShort(key: string) {
     const url = await this.linkRepository.findOne({
       where: {
-        domain: short,
+        key,
       },
     });
     return url;
   }
 
   async update(link: Link) {
+    link.clicks++;
     await this.linkRepository.save(link);
-  }
-
-  async remove(domain: string, user: User) {
-    const link = await this.linkRepository.findOne({
-      where: {
-        domain,
-      },
-    });
-
-    if (!link) {
-      throw new NotFoundException('Link not found');
-    }
-    if (link.user.username !== user.username) {
-      throw new ForbiddenException('Not allowed to delete this resource');
-    }
-    await this.linkRepository.delete(link);
-
-    return;
   }
 }

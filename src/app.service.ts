@@ -12,7 +12,6 @@ export class AppService {
     if (!link) {
       throw new NotFoundException('Link not found');
     }
-    link.clicks += 1;
     await this.linkService.update(link);
     res.redirect(link.originalUrl);
   }

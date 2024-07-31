@@ -2,15 +2,36 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
-  PrimaryColumn,
+  Index,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Link {
-  @PrimaryColumn()
-  domain: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({
+    unique: true,
+    nullable: false,
+  })
+  @Index()
+  key: string;
+
+  @Column({
+    nullable: false,
+  })
+  ip: string;
+
+  @Column({
+    nullable: false,
+  })
+  qrcode: string;
+
+  @Column({
+    nullable: false,
+  })
+  shortUrl: string;
 
   @Column({
     nullable: false,
@@ -22,9 +43,6 @@ export class Link {
     nullable: false,
   })
   clicks: number;
-
-  @ManyToOne('User', 'links')
-  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -3,45 +3,44 @@ import {
   Get,
   Post,
   Body,
-  Param,
-  Delete,
   HttpCode,
   HttpStatus,
+  Ip,
+  Param,
 } from '@nestjs/common';
 import { LinksService } from './links.service';
 import { CreateLinkDto } from './dto/create-link.dto';
-import { Public, UserReq } from '../decorators';
-import { User } from '../users/entities/user.entity';
-import { CustomLinkDto } from './dto/custom-link.dto';
 import { Throttle } from '@nestjs/throttler';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiTooManyRequestsResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('links')
 @Controller('api/links')
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
 
   @Throttle({ default: { limit: 25, ttl: 600000 } })
   @HttpCode(HttpStatus.CREATED)
-  @Public()
   @Post()
-  create(@Body() createLinkDto: CreateLinkDto) {
-    return this.linksService.create(createLinkDto);
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  @ApiCreatedResponse({ description: 'Short link created' })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  create(@Body() createLinkDto: CreateLinkDto, @Ip() ip) {
+    return this.linksService.create(createLinkDto, ip);
   }
 
-  @Throttle({ default: { limit: 20, ttl: 600000 } })
-  @HttpCode(HttpStatus.CREATED)
-  @Post('/custom')
-  custom(@Body() createLinkDto: CustomLinkDto, @UserReq() user: User) {
-    return this.linksService.custom(createLinkDto, user);
-  }
-
+  @ApiOkResponse({ description: 'All links founds' })
   @Get()
-  findAll(@UserReq() user: User) {
-    return this.linksService.findAll(user);
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':domain')
-  remove(@Param('domain') domain: string, @UserReq() user: User) {
-    return this.linksService.remove(domain, user);
+  findAll(
+    @Ip() ip,
+    @Param('limit') limit: string,
+    @Param('offset') offset: string,
+  ) {
+    return this.linksService.findAll(ip, limit, offset);
   }
 }
