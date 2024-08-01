@@ -37,17 +37,32 @@ export class LinksService {
     };
   }
 
-  async findAll(ip: string, pageLimit, pageOffset) {
-    const limit = parseInt(pageLimit) || 10;
-    const offset = parseInt(pageOffset) || 0;
-    const result = await this.linkRepository.findAndCount({
+  async findAll(ip: string, page, pageSize) {
+    const page_no = parseInt(page) || 1;
+    const page_size = parseInt(pageSize) || 5;
+
+    const offset = (page_no - 1) * page_size;
+    const limit = page_size;
+
+    const totalPages = await this.linkRepository.findAndCount();
+    const pages = await this.linkRepository.findAndCount({
       where: {
         ip,
+      },
+      order: {
+        createdAt: {
+          direction: 'DESC',
+        },
       },
       take: limit,
       skip: offset,
     });
-    return result[0];
+
+    return {
+      data: pages[0],
+      totatlPages: Math.ceil(totalPages[1] / pageSize),
+      pageSize: page_size,
+    };
   }
 
   async findShort(key: string) {

@@ -6,7 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Ip,
-  Param,
+  Query,
 } from '@nestjs/common';
 import { LinksService } from './links.service';
 import { CreateLinkDto } from './dto/create-link.dto';
@@ -38,9 +38,9 @@ export class LinksController {
   @Get()
   findAll(
     @Ip() ip,
-    @Param('limit') limit: string,
-    @Param('offset') offset: string,
+    @Query('page') page: string,
+    @Query('pageSize') pageSize: string,
   ) {
-    return this.linksService.findAll(ip, limit, offset);
+    return this.linksService.findAll(ip, page, pageSize);
   }
 }
