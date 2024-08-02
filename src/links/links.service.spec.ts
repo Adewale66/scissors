@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Link } from './entities/link.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import QRCode from 'qrcode';
+import { BadRequestException } from '@nestjs/common';
 
 describe('LinksService', () => {
   let service: LinksService;
@@ -11,11 +13,11 @@ describe('LinksService', () => {
   let configService: ConfigService;
 
   const repositoryMock = {
-    findOneBy: jest.fn(),
+    save: jest.fn(),
   };
 
   const configServiceMock = {
-    signAsync: jest.fn(),
+    get: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -40,5 +42,64 @@ describe('LinksService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('Creating a short link', () => {
+    it.skip('should successfully create a short link with alias', async () => {
+      const createLinkDto = {
+        originalUrl: 'https://www.google.com',
+        alias: 'google',
+      };
+      const ip = '127.0.0.1';
+      const link = new Link();
+      link.key = 'google';
+      link.shortUrl = 'http://localhost:3000/google';
+      link.originalUrl = 'https://www.google.com';
+      link.qrcode = 'qrcode';
+      link.ip = ip;
+
+      jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
+      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
+      jest.spyOn(QRCode, 'toDataURL').mockResolvedValue('qrcode');
+      const result = await service.create(createLinkDto, ip);
+
+      expect(result).toEqual({
+        shortUrl: 'http://localhost:3000/google',
+        qrcode: 'qrcode',
+      });
+    });
+
+    it.skip('should successfully create a short link without alias', async () => {
+      const createLinkDto = {
+        originalUrl: 'https://www.google.com',
+        alias: '',
+      };
+      const ip = '127.0.0.1';
+      const link = new Link();
+      link.key = 'google';
+      link.shortUrl = 'http://localhost:3000/google';
+      link.originalUrl = 'https://www.google.com';
+      link.qrcode = 'qrcode';
+      link.ip = ip;
+
+      jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
+      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
+      jest.spyOn(QRCode, 'toDataURL').mockResolvedValue('qrcode');
+      const result = await service.create(createLinkDto, ip);
+
+      expect(result).toBeDefined();
+    });
+
+    it('should throw an error for an invalid URL', async () => {
+      const createLinkDto = {
+        originalUrl: 'google',
+        alias: '',
+      };
+      const ip = '127.0.0.1';
+
+      expect(service.create(createLinkDto, ip)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
   });
 });
