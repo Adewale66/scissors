@@ -60,7 +60,7 @@ export class LinksService {
 
     return {
       data: pages[0],
-      totatlPages: Math.ceil(totalPages[1] / pageSize),
+      totalPages: Math.ceil(totalPages[1] / page_size),
       pageSize: page_size,
     };
   }

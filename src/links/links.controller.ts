@@ -24,7 +24,7 @@ import {
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
 
-  @Throttle({ default: { limit: 25, ttl: 600000 } })
+  @Throttle({ default: { limit: 10, ttl: 600000 } })
   @HttpCode(HttpStatus.CREATED)
   @Post()
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })

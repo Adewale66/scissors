@@ -2,13 +2,25 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 export function validateUrl(original: string) {
-  if (!original.endsWith('.com')) {
-    return undefined;
+  let fullUrl = original;
+
+  if (!original.startsWith('http://') && !original.startsWith('https://')) {
+    fullUrl = 'http://' + original;
   }
-  if (original.startsWith('http://') || original.startsWith('https://')) {
-    return original;
+
+  const regex = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+      '((\\d{1,3}\\.){3}\\d{1,3}))' +
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+      '(\\?[;&a-z\\d%_.~+=-]*)?' +
+      '(\\#[-a-z\\d_]*)?$',
+    'i',
+  );
+  if (regex.test(fullUrl)) {
+    return fullUrl;
   }
-  return 'http://' + original;
+  return null;
 }
 
 function generate(originalUrl: string) {
@@ -16,7 +28,7 @@ function generate(originalUrl: string) {
     .createHash('md5')
     .update(originalUrl + uuidv4())
     .digest('base64')
-    .substring(0, 6);
+    .substring(0, 5);
   return hash.replace(/\+/g, '0').replace(/\//g, '1');
 }
 
