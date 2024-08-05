@@ -19,6 +19,14 @@ export class LinksService {
     if (!original) {
       throw new BadRequestException('Invalid URL');
     }
+    if (
+      (createLinkDto.alias && createLinkDto.alias.length > 10) ||
+      createLinkDto.alias.length < 5
+    ) {
+      throw new BadRequestException(
+        'Alias must be between 5 and 10 characters',
+      );
+    }
     const short = generateShort(original, createLinkDto.alias);
 
     const shortUrl = this.configService.get('API_URL') + '/' + short;

@@ -42,13 +42,19 @@ npm install
 cat .env.example > .env
 ```
 
-### 4. Start application
+### 4. Run migration
+
+```sh
+npm run migration:run
+```
+
+### 5. Start application
 
 ```sh
 npm run start:dev
 ```
 
-### 5. Runinng tests
+### 6. Runinng tests
 
 ```sh
 npm run test
