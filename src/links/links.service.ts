@@ -20,8 +20,8 @@ export class LinksService {
       throw new BadRequestException('Invalid URL');
     }
     if (
-      (createLinkDto.alias && createLinkDto.alias.length > 10) ||
-      createLinkDto.alias.length < 5
+      createLinkDto.alias &&
+      (createLinkDto.alias.length > 10 || createLinkDto.alias.length < 5)
     ) {
       throw new BadRequestException(
         'Alias must be between 5 and 10 characters',
