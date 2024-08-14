@@ -26,6 +26,6 @@ async function bootstrap() {
     deepScanRoutes: true,
   });
   SwaggerModule.setup('docs', app, document);
-  await app.listen(8080);
+  await app.listen(process.env.PORT || 8080);
 }
 bootstrap();
