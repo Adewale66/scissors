@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Ip,
   Query,
+  Req,
 } from '@nestjs/common';
 import { LinksService } from './links.service';
 import { CreateLinkDto } from './dto/create-link.dto';
@@ -18,6 +19,7 @@ import {
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @ApiTags('links')
 @Controller('api/links')
@@ -38,9 +40,12 @@ export class LinksController {
   @Get()
   findAll(
     @Ip() ip,
+    @Req() req: Request,
     @Query('page') page: string,
     @Query('pageSize') pageSize: string,
   ) {
-    return this.linksService.findAll(ip, page, pageSize);
+    const userIp = req.headers['x-forwarded-for'] || ip;
+
+    return this.linksService.findAll(userIp, page, pageSize);
   }
 }
