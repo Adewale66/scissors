@@ -5,7 +5,6 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Ip,
   Query,
   Req,
 } from '@nestjs/common';
@@ -32,22 +31,21 @@ export class LinksController {
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   @ApiCreatedResponse({ description: 'Short link created' })
   @ApiBadRequestResponse({ description: 'Bad request' })
-  create(@Body() createLinkDto: CreateLinkDto, @Ip() ip) {
-    return this.linksService.create(createLinkDto, ip);
+  create(@Body() createLinkDto: CreateLinkDto, @Req() req: Request) {
+    return this.linksService.create(
+      createLinkDto,
+      req.headers['x-forwarded-for'][0],
+    );
   }
 
   @ApiOkResponse({ description: 'All links founds' })
   @Get()
   findAll(
-    @Ip() ip,
     @Req() req: Request,
     @Query('page') page: string,
     @Query('pageSize') pageSize: string,
   ) {
-    const userIp = req.headers['x-forwarded-for'] || ip;
-    console.log(ip);
-    console.log(req.headers['x-forwarded-for']);
-
+    const userIp = req.headers['x-forwarded-for'][0];
     return this.linksService.findAll(userIp, page, pageSize);
   }
 }
