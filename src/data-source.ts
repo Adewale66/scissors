@@ -11,6 +11,7 @@ const config = {
   synchronize: process.env.NODE_ENV === 'development',
   dropSchema: false,
   entities: ['./dist/**/*.entity.js'],
+  autoLoadEntities: true,
   migrations: ['./dist/db/migrations/*.js'],
   logging: false,
 };
