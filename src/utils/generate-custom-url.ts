@@ -1,6 +1,6 @@
-import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
+import ShortUniqueId from 'short-unique-id';
 
+const uid = new ShortUniqueId({ length: 5 });
 export function validateUrl(original: string) {
   let fullUrl = original;
 
@@ -23,15 +23,6 @@ export function validateUrl(original: string) {
   return null;
 }
 
-function generate(originalUrl: string) {
-  const hash = crypto
-    .createHash('md5')
-    .update(originalUrl + uuidv4())
-    .digest('base64')
-    .substring(0, 5);
-  return hash.replace(/\+/g, '0').replace(/\//g, '1');
-}
-
 export function generateShort(originalUrl: string, alias?: string) {
-  return alias ? alias : generate(originalUrl);
+  return alias ? alias : uid.rnd();
 }
