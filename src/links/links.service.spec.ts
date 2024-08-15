@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Link } from './entities/link.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import QRCode from 'qrcode';
+import QRCode from 'lib.dom';
 import { BadRequestException } from '@nestjs/common';
 
 describe('LinksService', () => {
