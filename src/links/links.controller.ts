@@ -32,6 +32,7 @@ export class LinksController {
   @ApiCreatedResponse({ description: 'Short link created' })
   @ApiBadRequestResponse({ description: 'Bad request' })
   create(@Body() createLinkDto: CreateLinkDto, @Req() req: Request) {
+    console.log(req.headers['x-forwarded-for'][0]);
     return this.linksService.create(
       createLinkDto,
       req.headers['x-forwarded-for'][0],
