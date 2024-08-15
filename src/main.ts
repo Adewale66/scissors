@@ -3,9 +3,10 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { QueryFailedFilter } from './exceptionFilter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,6 +22,7 @@ async function bootstrap() {
     .addTag('links', 'All Links related endpoints')
     .addTag('home', 'All Links related to redirection')
     .build();
+  app.set('trust proxy', 1);
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,
