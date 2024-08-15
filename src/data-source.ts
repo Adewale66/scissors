@@ -10,8 +10,8 @@ const config = {
   database: process.env.DATABASE,
   synchronize: process.env.NODE_ENV === 'development',
   dropSchema: false,
-  entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/db/migrations/*.js'],
+  entities: ['./dist/**/*.entity.js'],
+  migrations: ['./dist/db/migrations/*.js'],
   logging: false,
 };
 export const datasoure: DataSource = new DataSource(config);
