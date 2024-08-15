@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Link } from './entities/link.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import QRCode from 'qrcode';
+import * as QRCode from 'qrcode';
 import { generateShort, validateUrl } from '../utils/generate-custom-url';
 
 @Injectable()

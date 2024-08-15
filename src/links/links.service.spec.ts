@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Link } from './entities/link.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import QRCode from 'lib.dom';
 import { BadRequestException } from '@nestjs/common';
 
 describe('LinksService', () => {
@@ -60,7 +59,6 @@ describe('LinksService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
       jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
-      jest.spyOn(QRCode, 'toDataURL').mockResolvedValue('qrcode');
       const result = await service.create(createLinkDto, ip);
 
       expect(result).toEqual({
@@ -84,7 +82,6 @@ describe('LinksService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
       jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
-      jest.spyOn(QRCode, 'toDataURL').mockResolvedValue('qrcode');
       const result = await service.create(createLinkDto, ip);
 
       expect(result).toBeDefined();
