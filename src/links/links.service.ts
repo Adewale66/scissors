@@ -30,7 +30,7 @@ export class LinksService {
     const short = generateShort(original, createLinkDto.alias);
 
     const shortUrl = this.configService.get('API_URL') + '/' + short;
-    const qrcode = 'tet';
+    const qrcode = await QRCode.toDataURL(shortUrl);
     const link = new Link();
     link.key = short;
     link.shortUrl = shortUrl;
