@@ -35,7 +35,6 @@ export class LinksController {
     const userIp: string = req.headers['x-forwarded-for']
       .toString()
       .split(',')[0];
-    console.log('userIp', userIp);
     return this.linksService.create(createLinkDto, userIp);
   }
 
