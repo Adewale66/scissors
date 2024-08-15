@@ -8,7 +8,7 @@ const config = {
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE,
-  synchronize: process.env.NODE_ENV === 'development',
+  synchronize: true,
   dropSchema: false,
   entities: ['./dist/**/*.entity.js'],
   autoLoadEntities: true,
