@@ -32,11 +32,11 @@ export class LinksController {
   @ApiCreatedResponse({ description: 'Short link created' })
   @ApiBadRequestResponse({ description: 'Bad request' })
   create(@Body() createLinkDto: CreateLinkDto, @Req() req: Request) {
-    console.log(req.headers['x-forwarded-for'][0]);
-    return this.linksService.create(
-      createLinkDto,
-      req.headers['x-forwarded-for'][0],
-    );
+    const userIp: string = req.headers['x-forwarded-for']
+      .toString()
+      .split(',')[0];
+    console.log('userIp', userIp);
+    return this.linksService.create(createLinkDto, userIp);
   }
 
   @ApiOkResponse({ description: 'All links founds' })
@@ -46,7 +46,9 @@ export class LinksController {
     @Query('page') page: string,
     @Query('pageSize') pageSize: string,
   ) {
-    const userIp = req.headers['x-forwarded-for'][0];
+    const userIp: string = req.headers['x-forwarded-for']
+      .toString()
+      .split(',')[0];
     return this.linksService.findAll(userIp, page, pageSize);
   }
 }
