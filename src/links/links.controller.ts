@@ -45,6 +45,8 @@ export class LinksController {
     @Query('pageSize') pageSize: string,
   ) {
     const userIp = req.headers['x-forwarded-for'] || ip;
+    console.log(ip);
+    console.log(req.headers['x-forwarded-for']);
 
     return this.linksService.findAll(userIp, page, pageSize);
   }
