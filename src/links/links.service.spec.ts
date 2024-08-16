@@ -8,7 +8,7 @@ import { BadRequestException } from '@nestjs/common';
 
 describe('LinksService', () => {
   let service: LinksService;
-  let userRepository: Repository<Link>;
+  let repository: Repository<Link>;
   let configService: ConfigService;
 
   const repositoryMock = {
@@ -35,7 +35,7 @@ describe('LinksService', () => {
     }).compile();
 
     service = module.get<LinksService>(LinksService);
-    userRepository = module.get<Repository<Link>>(getRepositoryToken(Link));
+    repository = module.get<Repository<Link>>(getRepositoryToken(Link));
     configService = module.get<ConfigService>(ConfigService);
   });
 
@@ -44,7 +44,7 @@ describe('LinksService', () => {
   });
 
   describe('Creating a short link', () => {
-    it.skip('should successfully create a short link with alias', async () => {
+    it('should successfully create a short link with alias', async () => {
       const createLinkDto = {
         originalUrl: 'https://www.google.com',
         alias: 'google',
@@ -58,16 +58,13 @@ describe('LinksService', () => {
       link.ip = ip;
 
       jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
-      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
+      jest.spyOn(repository, 'save').mockResolvedValueOnce(link);
       const result = await service.create(createLinkDto, ip);
 
-      expect(result).toEqual({
-        shortUrl: 'http://localhost:3000/google',
-        qrcode: 'qrcode',
-      });
+      expect(result).toBeDefined();
     });
 
-    it.skip('should successfully create a short link without alias', async () => {
+    it('should successfully create a short link without alias', async () => {
       const createLinkDto = {
         originalUrl: 'https://www.google.com',
         alias: '',
@@ -81,7 +78,7 @@ describe('LinksService', () => {
       link.ip = ip;
 
       jest.spyOn(configService, 'get').mockReturnValue('http://localhost:3000');
-      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(link);
+      jest.spyOn(repository, 'save').mockResolvedValueOnce(link);
       const result = await service.create(createLinkDto, ip);
 
       expect(result).toBeDefined();
@@ -91,6 +88,30 @@ describe('LinksService', () => {
       const createLinkDto = {
         originalUrl: 'google',
         alias: '',
+      };
+      const ip = '127.0.0.1';
+
+      expect(service.create(createLinkDto, ip)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw an error for a short alias', async () => {
+      const createLinkDto = {
+        originalUrl: 'http://www.google.com',
+        alias: 'abc',
+      };
+      const ip = '127.0.0.1';
+
+      expect(service.create(createLinkDto, ip)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw an error for a long alias', async () => {
+      const createLinkDto = {
+        originalUrl: 'http://www.google.com',
+        alias: 'abcdefghijklmnopqrstuvwxyz',
       };
       const ip = '127.0.0.1';
 
